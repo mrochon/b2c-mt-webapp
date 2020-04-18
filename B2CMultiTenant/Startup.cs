@@ -24,6 +24,7 @@ using Microsoft.Identity.Client;
 using System.Security.Claims;
 using Microsoft.Extensions.Primitives;
 using System.Web;
+using Microsoft.IdentityModel.Logging;
 
 namespace B2CMultiTenant
 {
@@ -175,6 +176,7 @@ namespace B2CMultiTenant
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            IdentityModelEventSource.ShowPII = true;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
