@@ -24,17 +24,19 @@ using Microsoft.Identity.Client;
 using System.Security.Claims;
 using Microsoft.Extensions.Primitives;
 using System.Web;
-using Microsoft.IdentityModel.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace B2CMultiTenant
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             Configuration = configuration;
+            _logger = loggerFactory.CreateLogger<Startup>();
         }
         public IConfiguration Configuration { get; }
+        private ILogger _logger;
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -45,7 +47,7 @@ namespace B2CMultiTenant
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
             services.AddHttpContextAccessor();
-            services.AddScoped<Extensions.TokenService>();
+            services.AddScoped<TokenService>();
             services.AddTransient<RESTService>();
             services.AddTransient<InvitationService>();
             services
@@ -92,10 +94,12 @@ namespace B2CMultiTenant
         private void OptionsFor(OpenIdConnectOptions options, string policy)
         {
             var aadOptions = new AzureADOptions();
+            _logger.LogTrace("Domain: {0}", aadOptions.Domain);
             Configuration.Bind("AzureAD", aadOptions);
             options.ClientId = aadOptions.ClientId;
             var aadTenant = aadOptions.Domain.Split('.')[0];
             options.MetadataAddress = $"https://{aadTenant}.b2clogin.com/{aadOptions.TenantId}/b2c_1a_{policy}/v2.0/.well-known/openid-configuration";
+            _logger.LogTrace("Metadata: {0}", options.MetadataAddress);
             options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
             {
                 NameClaimType = "name"
@@ -176,7 +180,7 @@ namespace B2CMultiTenant
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            IdentityModelEventSource.ShowPII = true;
+            //IdentityModelEventSource.ShowPII = true;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
