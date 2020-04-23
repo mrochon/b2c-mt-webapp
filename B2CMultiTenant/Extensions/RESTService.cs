@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,7 @@ namespace B2CMultiTenant.Extensions
             _conf = conf;
             Url = conf["RESTUrl"];
         }
-        public static readonly string[] Scopes =
-        {
-            "https://b2cmultitenant.onmicrosoft.com/b2crestapi/Members.ReadAll",
-            "offline_access"
-        };
+
         //public static readonly string Url = "http://localhost:57688";
         public static string Url
         {
@@ -30,8 +27,16 @@ namespace B2CMultiTenant.Extensions
         IConfiguration _conf;
         public async Task<HttpClient> GetClientAsync()
         {
+            //TODO: code rpeated from Startup
+            var tenant = _conf.GetValue<string>("AzureAD:Domain");
+            var restApp = _conf.GetValue<string>("RestApp");
+            var scopes = new string[]
+            {
+                    $"https://{tenant}/{restApp}/Members.ReadAll",
+                    "offline_access"
+            };
             var client = new HttpClient();
-            var token = await _tokenService.GetUserTokenAsync(Scopes);
+            var token = await _tokenService.GetUserTokenAsync(scopes);
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             return client;
         }

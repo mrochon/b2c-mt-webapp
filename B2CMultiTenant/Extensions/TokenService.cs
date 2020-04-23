@@ -26,12 +26,12 @@ namespace B2CMultiTenant.Extensions
                 if (_authApp == null)
                 {
                     var journeyId = _httpContext.HttpContext.User.GetJourneyId();
+                    var tenant = _configuration.GetValue<string>("AzureAD:Domain").Split('.')[0];
                     _authApp = ConfidentialClientApplicationBuilder
                         .Create(_options.CurrentValue.ClientId)
                         .WithClientSecret(_options.CurrentValue.ClientSecret)
-                        //.WithClientSecret(_configuration["AzureAD:ClientSecret"])
-                        .WithB2CAuthority($"https://b2cmultitenant.b2clogin.com/tfp/{_options.CurrentValue.TenantId}/b2c_1a_{journeyId}")
-                        .WithRedirectUri($"http://localhost:62385/signin-{journeyId}")
+                        .WithB2CAuthority($"https://{tenant}.b2clogin.com/tfp/{_options.CurrentValue.TenantId}/b2c_1a_{journeyId}")
+                        //.WithRedirectUri($"http://localhost:62385/signin-{journeyId}")
                         .Build();
                     _authApp.UserTokenCache.SetBeforeAccess(BeforeAccessNotification);
                     _authApp.UserTokenCache.SetAfterAccess(AfterAccessNotification);

@@ -25,6 +25,8 @@ using System.Security.Claims;
 using Microsoft.Extensions.Primitives;
 using System.Web;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Formatters.Xml.Internal;
+using System.Diagnostics;
 
 namespace B2CMultiTenant
 {
@@ -62,7 +64,7 @@ namespace B2CMultiTenant
                     })
                     //.AddOpenIdConnect("mtsusi", options => OptionsFor(options, "mtsusi"))
                     .AddOpenIdConnect("mtsusi2", options => OptionsFor(options, "mtsusi2"))
-                    .AddOpenIdConnect("mtsusint", options => OptionsFor(options, "mtsusint"))
+                    //.AddOpenIdConnect("mtsusint", options => OptionsFor(options, "mtsusint"))
                     .AddOpenIdConnect("mtsusi-firsttenant", options => OptionsFor(options, "mtsusi-firsttenant"))
                     .AddOpenIdConnect("mtpasswordreset", options => OptionsFor(options, "mtpasswordreset"));
             services.Configure<ConfidentialClientApplicationOptions>(options => Configuration.Bind("AzureAD", options));
@@ -94,12 +96,12 @@ namespace B2CMultiTenant
         private void OptionsFor(OpenIdConnectOptions options, string policy)
         {
             var aadOptions = new AzureADOptions();
-            _logger.LogTrace("Domain: {0}", aadOptions.Domain);
+            Debug.WriteLine("Domain: {0}", aadOptions.Domain);
             Configuration.Bind("AzureAD", aadOptions);
             options.ClientId = aadOptions.ClientId;
             var aadTenant = aadOptions.Domain.Split('.')[0];
             options.MetadataAddress = $"https://{aadTenant}.b2clogin.com/{aadOptions.TenantId}/b2c_1a_{policy}/v2.0/.well-known/openid-configuration";
-            _logger.LogTrace("Metadata: {0}", options.MetadataAddress);
+            Debug.WriteLine("Metadata: {0}", options.MetadataAddress);
             options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
             {
                 NameClaimType = "name"
@@ -107,11 +109,17 @@ namespace B2CMultiTenant
             options.CallbackPath = new PathString($"/signin-{policy}"); // otherwise getting 'correlation error'
             options.SignedOutCallbackPath = new PathString($"/signout-{policy}");
             options.SignedOutRedirectUri = "/";
+            //TODO: Code repeated in RESTService
+            var scopes = new string[]
+            {
+                    $"https://{aadOptions.Domain}/{Configuration.GetValue<string>("RestApp")}/Members.ReadAll",
+                    "offline_access"
+            };
             if (policy.Contains("susi"))
             {
                 options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
                 //TODO: Improve, Concat could not be used
-                foreach (var s in RESTService.Scopes)
+                foreach (var s in scopes)
                     options.Scope.Add(s);
             }
             else
@@ -133,6 +141,7 @@ namespace B2CMultiTenant
             options.Events.OnAuthorizationCodeReceived = async (ctx) =>
             {
                 ctx.HandleCodeRedemption();
+                Debug.WriteLine("OnAuthCode called");
                 // The cache will need the claims from the ID token.
                 // If they are not yet in the HttpContext.User's claims, so adding them here.
                 if (!ctx.HttpContext.User.Claims.Any())
@@ -142,13 +151,15 @@ namespace B2CMultiTenant
                 var ts = ctx.HttpContext.RequestServices.GetRequiredService<Extensions.TokenService>();
                 var auth = ts.AuthApp;
                 var tokens = await auth.AcquireTokenByAuthorizationCode(
-                    RESTService.Scopes,
+                    scopes,
                     ctx.ProtocolMessage.Code).ExecuteAsync().ConfigureAwait(false);
                 ctx.HandleCodeRedemption(null, tokens.IdToken);
             };
             options.Events.OnRemoteFailure = (ctx) =>
             {
                 ctx.HandleResponse();
+                Debug.WriteLine("WebApp error called");
+                Debug.WriteLine("Error details: {0}", ctx.Failure.StackTrace);
                 if (!String.IsNullOrEmpty(ctx.Failure.Message))
                 {
                     if (ctx.Failure.Message.Contains("AADB2C90118"))
