@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.852
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2CMultiTenant", "B2CMultiTenant\B2CMultiTenant.csproj", "{479F9F9B-E1FE-45A3-BE6C-569E5A307A8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2CMultiTenant", "B2CMultiTenant.csproj", "{B0B55831-AEA3-4B1B-B0B5-34E065BB974C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{479F9F9B-E1FE-45A3-BE6C-569E5A307A8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{479F9F9B-E1FE-45A3-BE6C-569E5A307A8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{479F9F9B-E1FE-45A3-BE6C-569E5A307A8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{479F9F9B-E1FE-45A3-BE6C-569E5A307A8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0B55831-AEA3-4B1B-B0B5-34E065BB974C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0B55831-AEA3-4B1B-B0B5-34E065BB974C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0B55831-AEA3-4B1B-B0B5-34E065BB974C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0B55831-AEA3-4B1B-B0B5-34E065BB974C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {4334D742-2D82-4D33-BE88-19F6D6FBE984}
+		SolutionGuid = {A33CB751-4D05-42C0-9B4F-3FC7A411E677}
 	EndGlobalSection
 EndGlobal
