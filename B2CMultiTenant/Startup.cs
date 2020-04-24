@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.EntityFrameworkCore;
 using B2CMultiTenant.Models;
 using B2CMultiTenant.Extensions;
 using Microsoft.Identity.Client;
@@ -25,8 +24,8 @@ using System.Security.Claims;
 using Microsoft.Extensions.Primitives;
 using System.Web;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc.Formatters.Xml.Internal;
 using System.Diagnostics;
+using Microsoft.Extensions.Hosting;
 
 namespace B2CMultiTenant
 {
@@ -72,7 +71,7 @@ namespace B2CMultiTenant
 
             services.AddSession(options => options.Cookie.IsEssential = true);
             services
-                .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.Configure<InvitationTokenOptions>(options => Configuration.Bind("Invitation", options));
 
             //.AddMvc(options =>
@@ -189,7 +188,7 @@ namespace B2CMultiTenant
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             //IdentityModelEventSource.ShowPII = true;
             if (env.IsDevelopment())
@@ -211,12 +210,6 @@ namespace B2CMultiTenant
 
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
         }
     }
 }
