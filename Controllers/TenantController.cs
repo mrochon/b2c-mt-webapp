@@ -23,43 +23,31 @@ namespace B2CMultiTenant.Controllers
         RESTService _rest;
         public async Task<ActionResult> Edit()
         {
-            var tenantIdClaim = User.FindFirst("appTenantId"); 
-            if (tenantIdClaim != null)
+            var http = await _rest.GetClientAsync();
+            var json = await http.GetStringAsync($"{RESTService.Url}/tenant/oauth2");
+            var group = JObject.Parse(json);
+            return View(new TenantDetails
             {
-                var http = await _rest.GetClientAsync();
-                var tenantId = tenantIdClaim.Value;
-                var json = await http.GetStringAsync($"{RESTService.Url}/tenant/oauth2/{tenantId}");
-                var group = JObject.Parse(json);
-                return View(new TenantDetails
-                {
-                    Name = group["name"].Value<string>(),
-                    LongName = group["description"].Value<string>()
-                });
-            }
-            return View();
+                Name = group["name"].Value<string>(),
+                LongName = group["description"].Value<string>()
+            });
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind("Name,LongName, IsAADTenant, IdPDomainName")] TenantDetails tenant)
         {
-            var tenantIdClaim = User.FindFirst("appTenantId");
-            if (tenantIdClaim != null)
+            try
             {
-                try
-                {
-                    var http = await _rest.GetClientAsync();
-                    var tenantId = tenantIdClaim.Value;
-                    var json = await http.PutAsync(
-                        $"{RESTService.Url}/tenant/oauth2/{tenantId}",
-                        new StringContent(JObject.FromObject(tenant).ToString(), Encoding.UTF8, "application/json"));
-                    return RedirectToAction(nameof(Edit));
-                }
-                catch(Exception ex)
-                {
-                    throw;
-                }
+                var http = await _rest.GetClientAsync();
+                var json = await http.PutAsync(
+                    $"{RESTService.Url}/tenant/oauth2/",
+                    new StringContent(JObject.FromObject(tenant).ToString(), Encoding.UTF8, "application/json"));
+                return RedirectToAction(nameof(Edit));
             }
-            return View();
+            catch(Exception ex)
+            {
+                throw;
+            }
         }
     }
 }
