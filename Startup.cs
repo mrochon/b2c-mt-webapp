@@ -46,11 +46,11 @@ namespace B2CMultiTenant
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-            services.AddHttpContextAccessor();
-            services.AddScoped<TokenService>();
-            services.AddTransient<RESTService>();
-            services.AddTransient<InvitationService>();
             services
+                .AddHttpContextAccessor()
+                .AddScoped<TokenService>()
+                .AddTransient<RESTService>()
+                .AddTransient<InvitationService>()
                 .AddAuthentication(options =>
                 {
                     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -60,35 +60,16 @@ namespace B2CMultiTenant
                         options.LoginPath = "/Account/Unauthorized/";
                         options.AccessDeniedPath = "/Account/Forbidden/";
                     })
-                    //.AddOpenIdConnect("mtsusi", options => OptionsFor(options, "mtsusi"))
                     .AddOpenIdConnect("mtsusi2", options => OptionsFor(options, "mtsusi2"))
-                    //.AddOpenIdConnect("mtsusint", options => OptionsFor(options, "mtsusint"))
                     .AddOpenIdConnect("mtsusi-firsttenant", options => OptionsFor(options, "mtsusi-firsttenant"))
                     .AddOpenIdConnect("mtpasswordreset", options => OptionsFor(options, "mtpasswordreset"));
+
             services.Configure<ConfidentialClientApplicationOptions>(options => Configuration.Bind("AzureAD", options));
             services.Configure<InvitationTokenOptions>(options => Configuration.Bind("Invitation", options));
 
             services.AddSession(options => options.Cookie.IsEssential = true);
-            services
-                .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.Configure<InvitationTokenOptions>(options => Configuration.Bind("Invitation", options));
-
-            //.AddMvc(options =>
-            //{
-            //    var policy = new AuthorizationPolicyBuilder()
-            //        .RequireAuthenticatedUser()
-            //        .Build();
-            //    options.Filters.Add(new AuthorizeFilter(policy));
-            //})
-            //services.AddAuthorization(options =>
-            //{
-            //    var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
-            //        JwtBearerDefaults.AuthenticationScheme,
-            //        "AzureAD");
-            //    defaultAuthorizationPolicyBuilder =
-            //        defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
-            //    options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
-            //});
         }
 
         private void OptionsFor(OpenIdConnectOptions options, string policy)
@@ -210,6 +191,7 @@ namespace B2CMultiTenant
             app.UseSession();
 
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
