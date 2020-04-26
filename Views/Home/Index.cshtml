@@ -53,8 +53,8 @@
             exposed only to creators of new tenants).
         </p>
         <p>
-        Once signed up, a user may sign-in again by appending <i>?p=tenantName</i> parameter to the app url. (I am currently experimenting with 
-        another user journey which will not need a tenant name but will always sign in the user to the first tenant the user is a member of).
+        Once signed up, a user may sign-in again by appending <i>?p=tenantName</i> parameter to the app url. Otherwise (if there is no such
+            parameter), B2C will pick the first tenant the user is a member of or refuse sign in altogether.
         </p>
          <p>Source code for this app may be <a href="https://github.com/mrochon/b2csamples">found on github.</a></p>
         <p>For more info <a href="mailto:sailingrock@live.com">email me</a> or use the github source repo comments area.</p>
