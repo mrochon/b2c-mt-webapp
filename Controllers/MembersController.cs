@@ -12,19 +12,19 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
+using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace B2CMultiTenant.Controllers
 {
     [Authorize]
     public class MembersController : Controller
     {
-        public MembersController(RESTService rest, InvitationService invite)
+        public MembersController(RESTService rest)
         {
             _rest = rest;
-            _invite = invite;
         }
         RESTService _rest;
-        InvitationService _invite;
         // GET: Members
         public async Task<IActionResult> Index()
         {
@@ -53,16 +53,21 @@ namespace B2CMultiTenant.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles ="admin")]
-        public IActionResult Invite([Bind("Email,IsAdmin")] Invitee invitee)
+        public async Task<IActionResult> Invite([Bind("Email,IsAdmin")] Invitee invitee)
         {
             if (ModelState.IsValid)
             {
+                var http = await _rest.GetClientAsync();
                 var role = invitee.IsAdmin ? "admin" : "member";
-                invitee.InvitationUrl = _invite.GetInvitationUrl(invitee.Email, new Dictionary<string, string>()
-                {
-                    {"tenant", User.FindFirst("appTenantName").Value },
-                    {"roles",  $"[\"{role}\"]" }
-                });
+                var replyUrl = $"{Request.Scheme}://{Request.Host}/members/redeem";
+                var invitation = new { inviteEmail = invitee.Email, postRedeemUrl = replyUrl, additionalClaims = new Dictionary<string, string>() { { "role", role } } };
+                var resp = await http.PostAsync($"{RESTService.Url}/tenant/oauth2/invite",
+                   new StringContent(
+                        JsonConvert.SerializeObject(invitation),
+                        System.Text.Encoding.UTF8,
+                        "application/json"));
+                if (resp.IsSuccessStatusCode)
+                    invitee.InvitationUrl = await resp.Content.ReadAsStringAsync();
                 return View(invitee);
                 //return RedirectToAction(nameof(Invite));
             }

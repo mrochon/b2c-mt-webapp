@@ -50,7 +50,6 @@ namespace B2CMultiTenant
                 .AddHttpContextAccessor()
                 .AddScoped<TokenService>()
                 .AddTransient<RESTService>()
-                .AddTransient<InvitationService>()
                 .AddAuthentication(options =>
                 {
                     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -65,11 +64,9 @@ namespace B2CMultiTenant
                     .AddOpenIdConnect("mtpasswordreset", options => OptionsFor(options, "mtpasswordreset"));
 
             services.Configure<ConfidentialClientApplicationOptions>(options => Configuration.Bind("AzureAD", options));
-            services.Configure<InvitationTokenOptions>(options => Configuration.Bind("Invitation", options));
 
             services.AddSession(options => options.Cookie.IsEssential = true);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-            services.Configure<InvitationTokenOptions>(options => Configuration.Bind("Invitation", options));
         }
 
         private void OptionsFor(OpenIdConnectOptions options, string policy)
