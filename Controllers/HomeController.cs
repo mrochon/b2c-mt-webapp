@@ -78,11 +78,12 @@ namespace B2CMultiTenant.Controllers
         [Authorize]
         public IActionResult SignOut()
         {
-            var loginPath = User.Claims.First(c => c.Type == "http://schemas.microsoft.com/claims/authnclassreference").Value;
-            var policy = loginPath.Split('_')[2];
+            //var loginPath = User.Claims.First(c => c.Type == "http://schemas.microsoft.com/claims/authnclassreference").Value;
+            //var policy = loginPath.Split('_')[2];
+            //TODO: needs fixing - how to determine current policy name (affected by prefix). Seems to work anyway.
             return SignOut(
                 new AuthenticationProperties() { RedirectUri = "/Home/Index" },
-                new string[] { CookieAuthenticationDefaults.AuthenticationScheme, policy });
+                new string[] { CookieAuthenticationDefaults.AuthenticationScheme, "susi2" });
         }
         public IActionResult PwdReset()
         {
