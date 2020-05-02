@@ -40,6 +40,7 @@ namespace B2CMultiTenant
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var policyPrefix = Configuration.GetValue<string>("PolicyPrefix");
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -59,9 +60,9 @@ namespace B2CMultiTenant
                         options.LoginPath = "/Account/Unauthorized/";
                         options.AccessDeniedPath = "/Account/Forbidden/";
                     })
-                    .AddOpenIdConnect("mtsusi2", options => OptionsFor(options, "mtsusi2"))
-                    .AddOpenIdConnect("mtsusi-firsttenant", options => OptionsFor(options, "mtsusi-firsttenant"))
-                    .AddOpenIdConnect("mtpasswordreset", options => OptionsFor(options, "mtpasswordreset"));
+                    .AddOpenIdConnect("susi2", options => OptionsFor(options, "susi2"))
+                    .AddOpenIdConnect("susi-firsttenant", options => OptionsFor(options, "susi-firsttenant"))
+                    .AddOpenIdConnect("passwordreset", options => OptionsFor(options, "passwordreset"));
 
             services.Configure<ConfidentialClientApplicationOptions>(options => Configuration.Bind("AzureAD", options));
 
@@ -71,6 +72,8 @@ namespace B2CMultiTenant
 
         private void OptionsFor(OpenIdConnectOptions options, string policy)
         {
+            var policyPrefix = Configuration.GetValue<string>("PolicyPrefix");
+            policy = $"{policyPrefix}{policy}";
             var aadOptions = new AzureADOptions();
             Debug.WriteLine("Domain: {0}", aadOptions.Domain);
             Configuration.Bind("AzureAD", aadOptions);

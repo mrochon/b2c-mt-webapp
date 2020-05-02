@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using B2CMultiTenant.Extensions;
 using System.Security.Claims;
 using System.Web;
+using Microsoft.Extensions.Configuration;
 
 namespace B2CMultiTenant.Controllers
 {
@@ -35,7 +36,7 @@ namespace B2CMultiTenant.Controllers
                 if (Request.Query.ContainsKey("domain"))
                     authParms.Parameters.Add("domain", (string)Request.Query["domain"]);
                 return Challenge(authParms,
-                    new string[] { "mtsusi2" });
+                    new string[] { "susi2" });
             } else if (User.Identity.IsAuthenticated)
             {
                 var tenantName = User.FindFirst(c => c.Type == "appTenantName")?.Value;
@@ -51,13 +52,13 @@ namespace B2CMultiTenant.Controllers
             if (Request.Query.ContainsKey("domain"))
                 authParms.Parameters.Add("domain", (string)Request.Query["domain"]);
             return Challenge(authParms,
-                new string[] { "mtsusi-firsttenant" });
+                new string[] { "susi-firsttenant" });
             /*if (Request.Query.ContainsKey("tenant"))
             {
                 var authParms = new AuthenticationProperties() { RedirectUri = "/Home/Index" };
                 authParms.Parameters.Add("tenant", Request.Query["tenant"][0]);
                 return Challenge(authParms,
-                    new string[] { "mtsusi2" });
+                    new string[] { $"{policyPrefix}susi2" });
             };
             return View();*/
         }
@@ -69,9 +70,10 @@ namespace B2CMultiTenant.Controllers
         }
         public IActionResult NewTenant()
         {
+
             return Challenge(
                 new AuthenticationProperties() { RedirectUri = "/Home/Index" },
-                new string[] { "mtsusint" });
+                new string[] { "susint" });
         }
         [Authorize]
         public IActionResult SignOut()
@@ -86,7 +88,7 @@ namespace B2CMultiTenant.Controllers
         {
             return Challenge(
                 new AuthenticationProperties() { RedirectUri = "/Home/Index" },
-                new string[] { "mtpasswordreset" });
+                new string[] { "passwordreset" });
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
 using System.Net.Http;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace B2CMultiTenant.Controllers
 {
@@ -83,14 +84,7 @@ namespace B2CMultiTenant.Controllers
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.ReadJwtToken(id_token);
             var tenant = token.Claims.FirstOrDefault(c => c.Type == "appTenantName");
-            if (tenant != null)
-            {
-                var authParms = new AuthenticationProperties() { RedirectUri = "/Home/Index" };
-                authParms.Parameters.Add("tenant", tenant.Value);
-                return Challenge(authParms,
-                    new string[] { "mtsusi2" });
-            }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Home", $"?p={tenant}");
         }
 
         /*
