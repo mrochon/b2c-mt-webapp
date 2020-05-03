@@ -26,6 +26,7 @@ using System.Web;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Logging;
 
 namespace B2CMultiTenant
 {
@@ -60,6 +61,7 @@ namespace B2CMultiTenant
                         options.LoginPath = "/Account/Unauthorized/";
                         options.AccessDeniedPath = "/Account/Forbidden/";
                     })
+                    .AddOpenIdConnect("susiint", options => OptionsFor(options, "susint"))
                     .AddOpenIdConnect("susi2", options => OptionsFor(options, "susi2"))
                     .AddOpenIdConnect("susi-firsttenant", options => OptionsFor(options, "susi-firsttenant"))
                     .AddOpenIdConnect("passwordreset", options => OptionsFor(options, "passwordreset"));
@@ -174,6 +176,7 @@ namespace B2CMultiTenant
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                IdentityModelEventSource.ShowPII = true;
             }
             else
             {
