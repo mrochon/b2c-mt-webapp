@@ -61,7 +61,7 @@ namespace B2CMultiTenant
                         options.LoginPath = "/Account/Unauthorized/";
                         options.AccessDeniedPath = "/Account/Forbidden/";
                     })
-                    .AddOpenIdConnect("susiint", options => OptionsFor(options, "susint"))
+                    .AddOpenIdConnect("susint", options => OptionsFor(options, "susint"))
                     .AddOpenIdConnect("susi2", options => OptionsFor(options, "susi2"))
                     .AddOpenIdConnect("susi-firsttenant", options => OptionsFor(options, "susi-firsttenant"))
                     .AddOpenIdConnect("passwordreset", options => OptionsFor(options, "passwordreset"));
