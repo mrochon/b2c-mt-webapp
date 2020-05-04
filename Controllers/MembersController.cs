@@ -83,8 +83,8 @@ namespace B2CMultiTenant.Controllers
             await Task.Delay(10000); // wait 10s
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.ReadJwtToken(id_token);
-            var tenant = token.Claims.FirstOrDefault(c => c.Type == "appTenantName");
-            return RedirectToAction("Index", "Home", $"?p={tenant}");
+            var tenant = token.Claims.FirstOrDefault(c => c.Type == "appTenantName").Value;
+            return RedirectToAction("Index", "Home", new { tenant });
         }
 
         /*
