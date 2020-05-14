@@ -14,6 +14,9 @@ namespace B2CMultiTenant.Models
         [Required(ErrorMessage = "Please enter description"), MaxLength(30)]
         [Display(Name = "Long name")]
         public string LongName { get; set; }
+        [Required(ErrorMessage = "Enforce MFA for all users")]
+        [Display(Name = "Require MFA?")]
+        public bool RequireMFA { get; set; }
         public bool IsAADTenant { get; set; }
         public string IdPDomainName { get; set; }
     }

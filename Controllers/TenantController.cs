@@ -25,16 +25,17 @@ namespace B2CMultiTenant.Controllers
         {
             var http = await _rest.GetClientAsync();
             var json = await http.GetStringAsync($"{RESTService.Url}/tenant/oauth2");
-            var group = JObject.Parse(json);
+            var tenant = JObject.Parse(json);
             return View(new TenantDetails
             {
-                Name = group["name"].Value<string>(),
-                LongName = group["description"].Value<string>()
+                Name = tenant["name"].Value<string>(),
+                LongName = tenant["description"].Value<string>(),
+                RequireMFA = tenant["requireMFA"].Value<bool>()
             });
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind("Name,LongName, IsAADTenant, IdPDomainName")] TenantDetails tenant)
+        public async Task<ActionResult> Edit([Bind("Name,LongName, IsAADTenant, IdPDomainName, RequireMFA")] TenantDetails tenant)
         {
             try
             {
