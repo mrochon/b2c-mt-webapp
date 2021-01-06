@@ -17,7 +17,11 @@ namespace B2CMultiTenant.Models
         [Required(ErrorMessage = "Enforce MFA for all users")]
         [Display(Name = "Require MFA?")]
         public bool RequireMFA { get; set; }
-        public bool IsAADTenant { get; set; }
-        public string IdPDomainName { get; set; }
+        [Display(Name = "AAD directory id of tenant creator")]
+        [Editable(false)]
+        public string OwnerIssuer { get; set; }
+        [Display(Name = "Allow others from same directory to join with no invitation")]
+        [Editable(false)]
+        public bool AllowNoInviteFromSameIssuer { get; set; }
     }
 }

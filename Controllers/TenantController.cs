@@ -9,6 +9,7 @@ using B2CMultiTenant.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace B2CMultiTenant.Controllers
@@ -26,23 +27,36 @@ namespace B2CMultiTenant.Controllers
             var http = await _rest.GetClientAsync();
             var json = await http.GetStringAsync($"{RESTService.Url}/tenant/oauth2");
             var tenant = JObject.Parse(json);
-            return View(new TenantDetails
+            var details = new TenantDetails
             {
                 Name = tenant["name"].Value<string>(),
                 LongName = tenant["description"].Value<string>(),
-                RequireMFA = tenant["requireMFA"].Value<bool>()
-            });
+                RequireMFA = tenant["requireMFA"].Value<bool>(),
+            };
+            var idp = tenant["identityProvider]"]?.Value<string>();
+            if (!String.IsNullOrEmpty(idp) && idp.Equals("commonaad"))
+            {
+                details.OwnerIssuer = tenant["directoryId"].Value<string>();
+                details.AllowNoInviteFromSameIssuer = tenant["allowSameIssuerMembers"].Value<bool>();
+            }
+            return View() ;
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind("Name,LongName, IsAADTenant, IdPDomainName, RequireMFA")] TenantDetails tenant)
+        public async Task<ActionResult> Edit([Bind("Name,LongName,RequireMFA")] TenantDetails tenant)
         {
             try
             {
                 var http = await _rest.GetClientAsync();
+                var details = new
+                {
+                    name = tenant.Name,
+                    description = tenant.LongName,
+                    requireMFA = tenant.RequireMFA
+                };
                 var json = await http.PutAsync(
                     $"{RESTService.Url}/tenant/oauth2/",
-                    new StringContent(JObject.FromObject(tenant).ToString(), Encoding.UTF8, "application/json"));
+                    new StringContent(JsonConvert.SerializeObject(details), Encoding.UTF8, "application/json"));
                 return RedirectToAction(nameof(Edit));
             }
             catch(Exception ex)

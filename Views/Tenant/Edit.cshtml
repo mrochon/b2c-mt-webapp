@@ -26,6 +26,16 @@
                 <input asp-for="RequireMFA" class="form-control" />
                 <span asp-validation-for="RequireMFA" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="OwnerIssuer" class="control-label"></label>
+                <input asp-for="OwnerIssuer" class="form-control" />
+                <span asp-validation-for="OwnerIssuer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AllowNoInviteFromSameIssuer" class="control-label"></label>
+                <input asp-for="AllowNoInviteFromSameIssuer" class="form-control" />
+                <span asp-validation-for="AllowNoInviteFromSameIssuer" class="text-danger"></span>
+            </div>
             <!--div class="form-group">
         <label asp-for="IdPDomainName" class="control-label"></label>
         <input asp-for="IdPDomainName" class="form-control" />
