@@ -33,13 +33,13 @@ namespace B2CMultiTenant.Controllers
                 LongName = tenant["description"].Value<string>(),
                 RequireMFA = tenant["requireMFA"].Value<bool>(),
             };
-            var idp = tenant["identityProvider]"]?.Value<string>();
+            var idp = tenant["identityProvider"].Value<string>();
             if (!String.IsNullOrEmpty(idp) && idp.Equals("commonaad"))
             {
                 details.OwnerIssuer = tenant["directoryId"].Value<string>();
                 details.AllowNoInviteFromSameIssuer = tenant["allowSameIssuerMembers"].Value<bool>();
             }
-            return View() ;
+            return View(details) ;
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
